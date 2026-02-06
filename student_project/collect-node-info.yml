@@ -2,31 +2,26 @@
 - name: get node facts for SNOW
   hosts: nodes
   gather_facts: true
+  vars:
+    node_info: []
 
   tasks:
-  - name: Build node info list
-    ansible.builtin.set_fact:
-      node_info: >-
-        {{
-          node_info | default([]) + [
-            {
-              'hostname': ansible_facts['hostname'],
-              'default_ip': ansible_facts['default_ipv4']['address'],
-              'default_mac': ansible_facts['default_ipv4']['macaddress'],
-              'vendor': ansible_facts['product_name'],
-              'cpu': ansible_facts['processor_vcpus'],
-              'memory_mb': ansible_facts['memtotal_mb'],
-              'os': ansible_facts['distribution'],
-              'os_version': ansible_facts['distribution_version'],
-              'architecture': ansible_facts['architecture']
-            }
-          ]
-        }}
-
-
-  - name: Save node info to file
-    copy:
-      content: "{{ node_info | to_json }}"
-      dest: /tmp/node_info.json
-    delegate_to: localhost
-    run_once: true
+    - name: Collect inventory facts
+      ansible.builtin.set_stats:
+        data:
+          node_info: >-
+            {{
+              node_info + [
+                {
+                  'hostname': ansible_facts['hostname'],
+                  'default_ip': ansible_facts['default_ipv4']['address'],
+                  'default_mac': ansible_facts['default_ipv4']['macaddress'],
+                  'vendor': ansible_facts['product_name'],
+                  'cpu': ansible_facts['processor_vcpus'],
+                  'memory_mb': ansible_facts['memtotal_mb'],
+                  'os': ansible_facts['distribution'],
+                  'os_version': ansible_facts['distribution_version'],
+                  'architecture': ansible_facts['architecture']
+                }
+              ]
+            }}

@@ -28,7 +28,6 @@
         short_description: >-
           {{ item.cpu }} CPUs, {{ item.memory_mb }}MB RAM,
           {{ item.os }} {{ item.os_version }} ({{ item.architecture }})
-
     loop: "{{ node_info }}"
     register: configuration_item
 
