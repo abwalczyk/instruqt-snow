@@ -33,7 +33,7 @@
 
   - name: Create change request for resolving a problem
     servicenow.itsm.change_request:
-      state: assess              # or "assess" depending on workflow
+      state: new              # or "assess" depending on workflow
       type: standard
       category: software
       priority: moderate

@@ -8,18 +8,21 @@
     ansible.builtin.set_fact:
       node_info: >-
         {{
-          node_info | default([]) + [{
-            'hostname': ansible_facts['hostname'],
-            'default_ip': ansible_facts['default_ipv4']['address'],
-            'default_mac': ansible_facts['default_ipv4']['macaddress'],
-            'vendor': ansible_facts['product_name'],
-            'cpu': ansible_facts['processor_vcpus'],
-            'memory_mb': ansible_facts['memtotal_mb'],
-            'os': ansible_facts['distribution'],
-            'os_version': ansible_facts['distribution_version'],
-            'architecture': ansible_facts['architecture']
-          }]
-        }
+          node_info | default([]) + [
+            {
+              'hostname': ansible_facts['hostname'],
+              'default_ip': ansible_facts['default_ipv4']['address'],
+              'default_mac': ansible_facts['default_ipv4']['macaddress'],
+              'vendor': ansible_facts['product_name'],
+              'cpu': ansible_facts['processor_vcpus'],
+              'memory_mb': ansible_facts['memtotal_mb'],
+              'os': ansible_facts['distribution'],
+              'os_version': ansible_facts['distribution_version'],
+              'architecture': ansible_facts['architecture']
+            }
+          ]
+        }}
+
 
   - name: Save node info to file
     copy:
