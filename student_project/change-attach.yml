@@ -27,28 +27,36 @@
   - name: Assign problem for assessment
     servicenow.itsm.problem:
       number: "{{ item.number }}"
-      state: "Pending Change"
+      state: 3
       assigned_to: "{{ demo_username }}"
     loop: "{{ problem_list }}"
 
   - name: Create change request for resolving a problem
     servicenow.itsm.change_request:
-      state: new
+      state: new              # or "assess" depending on workflow
       type: standard
       category: software
-      short_description: "Reboot the webserver test"
+      priority: moderate
+      risk: low
 
-      implementation_plan: "Reboot affected servers"
-      justification: "Reference to related problem or incident"
-      risk_impact_analysis: "Low risk change"
-      backout_plan: "Restart services if reboot fails"
-      test_plan: "Verify website is reachable"
+      short_description: "Reboot the webserver"
+      description: "Change required to remediate the related problem by rebooting the affected webserver."
+
+      requested_by: "{{ demo_username }}"
 
       other:
-        parent: "{{ item.number }}"
+        problem: "{{ item.number }}"   # Problem-Change linkage
+        justification: "Reference to related problem {{ item.number }}"
+        implementation_plan: "Reboot affected servers"
+        backout_plan: "Restart services if reboot fails"
+        test_plan: "Verify website is reachable after reboot"
+        risk_impact_analysis: "Low impact change"
+        start_date: "2026-02-07 02:00:00"
+        end_date: "2026-02-07 02:30:00"
 
     loop: "{{ problem_list }}"
     register: change
+
 
     # - debug:
     #     msg: "A new change request has been created {{ change.record.number }}"
