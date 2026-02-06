@@ -7,7 +7,6 @@
 
   vars:
     demo_username: "{{ lookup('env', 'SN_USERNAME') }}"
-    node_info: "{{ lookup('file', '/tmp/node_info.json') | from_json }}"
 
   tasks:
   - name: Create/update configuration item
@@ -20,14 +19,20 @@
 
       other:
         sys_class_name: cmdb_ci_linux_server
+
+        host_name: "{{ item.hostname }}"
+        cpu_count: "{{ item.cpu }}"
         cpu_core_count: "{{ item.cpu }}"
         ram: "{{ item.memory_mb }}"
-        os: "{{ item.os }}"
-        os_version: "{{ item.os_version }}"
         architecture: "{{ item.architecture }}"
-        short_description: >-
+        os_version: "{{ item.os_version }}"
+        disk_space: "{{ item.disk_gb | default(omit) }}"
+        dns_domain: "lab.local"
+
+        description: >-
           {{ item.cpu }} CPUs, {{ item.memory_mb }}MB RAM,
           {{ item.os }} {{ item.os_version }} ({{ item.architecture }})
+
     loop: "{{ node_info }}"
     register: configuration_item
 
