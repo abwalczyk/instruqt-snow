@@ -4,11 +4,12 @@
   connection: local
   collections:
     - servicenow.itsm
+
   vars:
     demo_username: "{{ lookup('env', 'SN_USERNAME') }}"
+    node_info: "{{ lookup('file', '/tmp/node_info.json') | from_json }}"
 
   tasks:
-
   - name: Create/update configuration item
     servicenow.itsm.configuration_item:
       name: "{{ item.hostname }}-{{ demo_username }}"
@@ -16,12 +17,22 @@
       ip_address: "{{ item.default_ip }}"
       mac_address: "{{ item.default_mac }}"
       environment: test
+
       other:
         sys_class_name: cmdb_ci_linux_server
-        operating_system: "Linux Red Hat"
+        cpu_core_count: "{{ item.cpu }}"
+        ram: "{{ item.memory_mb }}"
+        os: "{{ item.os }}"
+        os_version: "{{ item.os_version }}"
+        architecture: "{{ item.architecture }}"
+        short_description: >-
+          {{ item.cpu }} CPUs, {{ item.memory_mb }}MB RAM,
+          {{ item.os }} {{ item.os_version }} ({{ item.architecture }})
+
     loop: "{{ node_info }}"
     register: configuration_item
 
-  - name: debug
-    debug:
-      msg: "{{ configuration_item }}"
+  - debug:
+      msg: "Created/updated CI {{ item.record.name }}"
+    loop: "{{ configuration_item.results }}"
+
