@@ -70,6 +70,8 @@
       number: "{{ item.number }}"
       close_code: "Solved (Permanently)"
       close_notes: "Closed with ansible servicenow.itsm"
+      resolution_code: "Solved (Permanently)"
+      resolution_notes: "Automated cleanup"
       other:
         active: false
     with_items: "{{ incident_list }}"
@@ -78,9 +80,12 @@
 
   - name: close problems from list
     servicenow.itsm.problem:
-      state: absent
+      state: closed
       assigned_to: "{{ demo_username }}"
       number: "{{ item.number }}"
+      resolution_code: "fix_applied"
+      cause_notes: "Workshop completion"
+      fix_notes: "Workshop completion"
       other:
         active: false
     with_items: "{{ problem_list }}"
@@ -95,14 +100,14 @@
       number: "{{ item.number }}"
       other:
         active: false
+        implementation_notes: "Automated"
     with_items: "{{ change_list }}"
     when: 
       - change_list is defined
 
-  - name: remove configuration items from list
-    servicenow.itsm.configuration_item:
-      state: absent
-      sys_id: "{{ item.number }}"
+  - name: skip configuration items - CIs remain active
+    ansible.builtin.debug:
+      msg: "Configuration item {{ item.number }} remains active (CIs typically aren't closed)"
     with_items: "{{ config_list }}"
     when: 
       - config_list is defined
