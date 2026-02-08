@@ -69,9 +69,7 @@
       state: closed
       number: "{{ item.number }}"
       close_code: "Solved (Permanently)"
-      close_notes: "Closed with ansible servicenow.itsm"
-      resolution_code: "Solved (Permanently)"
-      resolution_notes: "Automated cleanup"
+      close_notes: "Automated cleanup"
       other:
         active: false
     with_items: "{{ incident_list }}"
@@ -83,11 +81,12 @@
       state: closed
       assigned_to: "{{ demo_username }}"
       number: "{{ item.number }}"
-      resolution_code: "fix_applied"
-      cause_notes: "Workshop completion"
-      fix_notes: "Workshop completion"
+      close_notes: "Workshop completion"
       other:
         active: false
+        resolution_code: "fix_applied"
+        cause_notes: "Workshop completion"
+        fix_notes: "Workshop completion"
     with_items: "{{ problem_list }}"
     when: 
       - problem_list is defined
