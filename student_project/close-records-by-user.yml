@@ -80,7 +80,7 @@
     servicenow.itsm.problem:
       state: closed
       number: "{{ item.number }}"
-      resolution_code: "Workshop complete"
+      resolution_code: "fix_applied"
     loop: "{{ problem_list }}"
     when: problem_list | length > 0
 
