@@ -78,11 +78,13 @@
 
   - name: close problems from list
     servicenow.itsm.problem:
-      state: closed
+      state: absent
       number: "{{ item.number }}"
-      close_notes: "Workshop completion"
-    loop: "{{ problem_list }}"
-    when: problem_list | length > 0
+      other:
+        active: false
+    with_items: "{{ problem_list }}"
+    when: 
+      - problem_list is defined
 
   - name: close change requests from list
     servicenow.itsm.change_request:
