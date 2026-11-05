@@ -11,6 +11,19 @@
 
   tasks:
 
+    - name: Upgrade ServiceNow collection
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install servicenow.itsm:2.13.2 --force
+      delegate_to: localhost
+
+    - name: Check ServiceNow collection version
+      ansible.builtin.command: ansible-galaxy collection list servicenow.itsm
+      register: collection_version
+      changed_when: false
+
+    - ansible.builtin.debug:
+        var: collection_version.stdout_lines
+
     - name: find user created incidents
       servicenow.itsm.incident_info:
         query:
@@ -33,7 +46,6 @@
     - name: Assign a problem to a user for assessment
       servicenow.itsm.problem:
         number: "{{ problem.record.number }}"
-        state: 1
         assigned_to: "{{ lookup('env', 'SN_USERNAME') }}"
 
     - name: Update incident status now that problem has been created
