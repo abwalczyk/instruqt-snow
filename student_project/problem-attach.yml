@@ -16,6 +16,12 @@
         cmd: ansible-galaxy collection install servicenow.itsm:2.13.2 --force
       delegate_to: localhost
 
+    - name: Remove old ServiceNow collection
+      ansible.builtin.file:
+        path: /usr/share/ansible/collections/ansible_collections/servicenow/itsm
+        state: absent
+        become: true
+
     - name: Check ServiceNow collection version
       ansible.builtin.command: ansible-galaxy collection list servicenow.itsm
       register: collection_version
