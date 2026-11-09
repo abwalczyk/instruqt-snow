@@ -27,6 +27,12 @@
       register: collection_version
       changed_when: false
 
+    - name: Install Python 3.11
+      become: true
+      ansible.builtin.dnf:
+        name: python3.11
+        state: present
+
     - ansible.builtin.debug:
         var: collection_version.stdout_lines
 
