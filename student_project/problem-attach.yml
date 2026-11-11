@@ -59,37 +59,24 @@
     - name: Create a problem from incident
       servicenow.itsm.problem:
         short_description: "The website is completely down!!!!"
-        description: "{{ lookup('env', 'SN_USERNAME') }} created a new problem"
-      register: problem
-      problem_mapping:
+        description: "{{ lookup('env', 'SN_USERNAME') }} created a new problem"      
+        problem_mapping:
         state:
           "1": new
-          "2": assess
-          "3": fix_in_progress
-          "4": resolved
         problem_state:
           "1": new
-          "2": assess
-          "3": fix_in_progress
-          "4": resolved
+      register: problem
+
 
     - name: Assign a problem to a user for assessment
       servicenow.itsm.problem:
         number: "{{ problem.record.number }}"
         assigned_to: "{{ lookup('env', 'SN_USERNAME') }}"
-        state: 2
-        problem_state: 2
         problem_mapping:
           state:
             "1": new
-            "2": assess
-            "3": fix_in_progress
-            "4": resolved
           problem_state:
             "1": new
-            "2": assess
-            "3": fix_in_progress
-            "4": resolved
 
     - name: Update incident status now that problem has been created
       servicenow.itsm.incident:
@@ -97,7 +84,22 @@
         state: in_progress
         other:
           problem_id: "{{ problem.record.sys_id }}"
+        incident_mapping:
+          close_code:
+            "": ""
       loop: "{{ incident_list }}"
+
+    - name: Verify incident problem relationships
+      servicenow.itsm.incident_info:
+        query:
+          - number: = {{ item.number }}
+      register: linked_incidents
+      loop: "{{ incident_list }}"
+
+    - name: Display incident problem relationships
+      ansible.builtin.debug:
+        msg: "{{ item.records[0].number }} -> problem_id: {{ item.records[0].problem_id }}"
+      loop: "{{ linked_incidents.results }}"
 
     - debug:
         msg: "A new problem has been created {{ problem.record.number }}"
