@@ -45,6 +45,9 @@
         query:
           - sys_created_by: LIKE {{ demo_username }}
             active: = true
+        incident_mapping:
+          close_code:
+            "": ""
       register: incidents
 
     - name: query incident number and creation time 
@@ -58,11 +61,35 @@
         short_description: "The website is completely down!!!!"
         description: "{{ lookup('env', 'SN_USERNAME') }} created a new problem"
       register: problem
+      problem_mapping:
+        state:
+          "1": new
+          "2": assess
+          "3": fix_in_progress
+          "4": resolved
+        problem_state:
+          "1": new
+          "2": assess
+          "3": fix_in_progress
+          "4": resolved
 
     - name: Assign a problem to a user for assessment
       servicenow.itsm.problem:
         number: "{{ problem.record.number }}"
         assigned_to: "{{ lookup('env', 'SN_USERNAME') }}"
+        state: 2
+        problem_state: 2
+        problem_mapping:
+          state:
+            "1": new
+            "2": assess
+            "3": fix_in_progress
+            "4": resolved
+          problem_state:
+            "1": new
+            "2": assess
+            "3": fix_in_progress
+            "4": resolved
 
     - name: Update incident status now that problem has been created
       servicenow.itsm.incident:
