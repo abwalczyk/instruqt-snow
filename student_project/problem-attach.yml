@@ -59,12 +59,14 @@
     - name: Create a problem from incident
       servicenow.itsm.problem:
         short_description: "The website is completely down!!!!"
-        description: "{{ lookup('env', 'SN_USERNAME') }} created a new problem"      
+        description: "{{ lookup('env', 'SN_USERNAME') }} created a new problem"
+        other:
+          parent: "{{ incidents.records[0].sys_id }}"   
         problem_mapping:
-        state:
-          "1": new
-        problem_state:
-          "1": new
+          state:
+            "1": new
+          problem_state:
+            "1": new
       register: problem
 
 
