@@ -11,34 +11,34 @@
 
   tasks:
 
-    - name: Remove old ServiceNow collection
-      become: true
-      ansible.builtin.file:
-        path: /usr/share/ansible/collections/ansible_collections/servicenow/itsm
-        state: absent
+    # - name: Remove old ServiceNow collection
+    #   become: true
+    #   ansible.builtin.file:
+    #     path: /usr/share/ansible/collections/ansible_collections/servicenow/itsm
+    #     state: absent
 
-    - name: Install ServiceNow collection 2.13.2
-      become: true
-      ansible.builtin.command:
-        cmd: ansible-galaxy collection install servicenow.itsm:2.13.2 -p /usr/share/ansible/collections --force
+    # - name: Install ServiceNow collection 2.13.2
+    #   become: true
+    #   ansible.builtin.command:
+    #     cmd: ansible-galaxy collection install servicenow.itsm:2.13.2 -p /usr/share/ansible/collections --force
 
-    - name: Check ServiceNow collection version
-      ansible.builtin.command:
-        cmd: ansible-galaxy collection list servicenow.itsm
-      register: collection_version
-      changed_when: false
+    # - name: Check ServiceNow collection version
+    #   ansible.builtin.command:
+    #     cmd: ansible-galaxy collection list servicenow.itsm
+    #   register: collection_version
+    #   changed_when: false
 
-    - ansible.builtin.debug:
-        var: collection_version.stdout_lines
+    # - ansible.builtin.debug:
+    #     var: collection_version.stdout_lines
 
-    - name: Install Python 3.11
-      become: true
-      ansible.builtin.dnf:
-        name: python3.11
-        state: present
+    # - name: Install Python 3.11
+    #   become: true
+    #   ansible.builtin.dnf:
+    #     name: python3.11
+    #     state: present
 
-    - ansible.builtin.debug:
-        var: collection_version.stdout_lines
+    # - ansible.builtin.debug:
+    #     var: collection_version.stdout_lines
 
     - name: find user created incidents
       servicenow.itsm.incident_info:
