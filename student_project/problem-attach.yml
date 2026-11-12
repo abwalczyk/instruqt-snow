@@ -22,23 +22,11 @@
       ansible.builtin.command:
         cmd: ansible-galaxy collection install servicenow.itsm:2.13.2 -p /usr/share/ansible/collections --force
 
-    - name: Check ServiceNow collection version
-      ansible.builtin.command:
-        cmd: ansible-galaxy collection list servicenow.itsm
-      register: collection_version
-      changed_when: false
-
-    - ansible.builtin.debug:
-        var: collection_version.stdout_lines
-
     - name: Install Python 3.11
       become: true
       ansible.builtin.dnf:
         name: python3.11
         state: present
-
-    - ansible.builtin.debug:
-        var: collection_version.stdout_lines
 
     - name: find user created incidents
       servicenow.itsm.incident_info:
@@ -54,6 +42,8 @@
       set_fact:
         incident_list: '{{ incident_list + [{"number": item.number, "opened_at": item.opened_at}] }}'
       loop: "{{ incidents.records }}"
+      loop_control:
+        label: "{{ item.number }}"
       when: incidents
 
     - name: Create a problem from incident
@@ -91,17 +81,6 @@
             "": ""
       loop: "{{ incident_list }}"
 
-    - name: Verify incident problem relationships
-      servicenow.itsm.incident_info:
-        query:
-          - number: = {{ item.number }}
-      register: linked_incidents
-      loop: "{{ incident_list }}"
-
-    - name: Display incident problem relationships
-      ansible.builtin.debug:
-        msg: "{{ item.records[0].number }} -> problem_id: {{ item.records[0].problem_id }}"
-      loop: "{{ linked_incidents.results }}"
 
     - debug:
         msg: "A new problem has been created {{ problem.record.number }}"
